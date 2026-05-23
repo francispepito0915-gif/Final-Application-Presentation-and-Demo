@@ -1,0 +1,392 @@
+
+<!-- 
+      
+      Updated code: 
+      Editor: Francis Pepito
+      Date: May 22. 2026
+
+      new features(from lines 27-71):
+        
+      - Added a tabbed login/signup form with password visibility toggles and a password strength meter.
+      
+      --> 
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marchendise Beverages</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section class="login-screen" id="loginScreen">
+    <form class="login-card" id="loginForm">
+      <p class="shop-label">Order Smart. Drink Fresh.</p>
+      <h1>Marchendise Beverages</h1> 
+      
+<!--STARTING HERE -->
+      <div class="auth-tabs">
+        <button type="button" class="tab-btn active" id="showLoginBtn">Login</button>
+        <button type="button" class="tab-btn" id="showSignupBtn">Create Account</button>
+      </div>
+
+      <div class="auth-panel" id="loginPanel">
+        <label for="usernameInput">Username</label>
+        <input type="text" id="usernameInput" autocomplete="username" placeholder="Enter username">
+
+        <label for="loginPasswordInput">Password</label>
+        <div class="password-field">
+         <input type="password" id="loginPasswordInput" autocomplete="current-password" placeholder="Enter password">
+         <button class="password-toggle" type="button" data-target="loginPasswordInput">Show</button>
+        </div>
+
+        <button class="complete-btn" type="submit">Login</button>
+      </div>
+
+      <div class="auth-panel hidden" id="signupPanel">
+        <label for="signupUsernameInput">Username</label>
+        <input type="text" id="signupUsernameInput" autocomplete="username" placeholder="Choose a username">
+
+        <label for="signupRoleSelect">Account role</label>
+        <select id="signupRoleSelect">
+          <option value="Cashier">Cashier</option>
+          <option value="Admin">Admin</option>
+        </select>
+
+        <label for="signupPasswordInput">Password</label>
+        <div class="password-field">
+          <input type="password" id="signupPasswordInput" autocomplete="new-password" placeholder="Choose a strong password">
+          <button class="password-toggle" type="button" data-target="signupPasswordInput">Show</button>
+        </div>
+        <div class="password-strength" id="passwordStrength">
+          <span id="passwordStrengthText">Strength: Very weak</span>
+          <div class="strength-meter"><span id="passwordStrengthBar"></span></div>
+        </div>
+
+        <label for="signupConfirmPasswordInput">Confirm password</label>
+        <div class="password-field">
+          <input type="password" id="signupConfirmPasswordInput" autocomplete="new-password" placeholder="Re-enter password">
+          <button class="password-toggle" type="button" data-target="signupConfirmPasswordInput">Show</button>
+        </div>
+
+        <button class="complete-btn" type="button" id="signupBtn">Create Account</button>
+      </div>
+
+      <p class="login-note" id="loginNote">
+        Create your own secure account and sign in to use the POS system. 
+      </p>
+      <p class="message" id="loginMessage"></p>
+    </form>
+  </section>
+
+  <div class="app-shell hidden" id="appShell">
+    <header class="app-header">
+      <div class="hero-faded-bg" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <p class="hero-slogan">Serving drinks sweeter than your mixed signals.</p>
+        <p class="hero-quote">Made with love, unlike your situationship.</p>
+        
+      </div>
+      <div class="hero-art">
+        <img src="images/hero-banner.png" alt="Decorative beverage collage">
+        <h1 class="hero-title hero-title-art">
+          <span class="title-pink">Marchendise</span>
+          <span class="title-brown">Beverages</span>
+        </h1>
+      </div>
+      <div class="user-box">
+        <span id="roleDisplay">Role: Guest</span>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <main class="pos-layout">
+      <section class="menu-section">
+        <div class="category-bar" aria-label="Product categories">
+          <button class="category-btn active" data-category="All">All</button>
+          <button class="category-btn" data-category="Coffee">Coffee</button>
+          <button class="category-btn" data-category="Juice">Juice</button>
+          <button class="category-btn" data-category="Milk Tea">Milk Tea</button>
+        </div>
+
+        <div class="section-heading">
+          <h2>Product Menu</h2>
+          <p>Choose a drink to add it to the order.</p>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+                <div class="material-status-card">
+                    <div class="section-heading compact-heading">
+                        <h2>Material Stock Status</h2>
+                        <p>Stock is simulated by ingredients/materials for completed orders.</p>
+                    </div>
+                    <div class="material-status-strip" id="cashierMaterialStatus"></div>
+                </div>
+      </section>
+
+      <aside class="cart-panel">
+        <div class="cart-header">
+          <h2>Order Summary</h2>
+          <span id="itemCount">0 items</span>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+          <p class="empty-cart">No drinks added yet.</p>
+        </div>
+
+        <div class="payment-box">
+          <div class="total-row">
+            <span>Total Amount</span>
+            <strong id="totalAmount">PHP 0.00</strong>
+          </div>
+
+          <label for="cashInput">Cash</label>
+          <input type="number" id="cashInput" min="0" step="1" placeholder="Enter cash amount">
+
+          <div class="change-row">
+            <span>Change</span>
+            <strong id="changeAmount">PHP 0.00</strong>
+          </div>
+
+          <p class="message" id="message"></p>
+        </div>
+
+        <div class="action-buttons">
+          <button class="complete-btn" id="completeBtn">Complete Transaction</button>
+          <button class="cancel-btn" id="cancelBtn">Cancel Transaction</button>
+          <button class="reset-btn" id="resetBtn">Reset/New Transaction</button>
+        </div>
+      </aside>
+    </main>
+
+    <section class="admin-panel hidden" id="adminPanel">
+            <div class="admin-card wide-card">
+                <div class="section-heading">
+                    <span>Admin Module</span>
+                    <h2>Beverage Management</h2>
+                    <p>Add new beverages, edit details, or deactivate products without deleting transaction history.</p>
+                </div>
+                <form id="beverageForm" class="management-form">
+                    <input type="hidden" id="beverageEditId">
+                    <label>
+                        Beverage Name
+                        <input type="text" id="beverageNameInput" placeholder="Example: Mango Latte">
+                    </label>
+                    <label>
+                        Category
+                        <select id="beverageCategorySelect">
+                            <option value="Coffee">Coffee</option>
+                            <option value="Juice">Juice</option>
+                            <option value="Milk Tea">Milk Tea</option>
+                        </select>
+                    </label>
+                    <label>
+                        Image Path
+                        <input type="text" id="beverageImageInput" placeholder="images/coffee/mango-latte.png">
+                    </label>
+                    <label>
+                        Status
+                        <select id="beverageStatusSelect">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </label>
+                    <button type="submit">Save Beverage</button>
+                    <button type="button" class="secondary-btn" id="clearBeverageFormBtn">Clear Form</button>
+                </form>
+                <div class="admin-table-wrap" id="beverageList"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Admin Module</span>
+                    <h2>Price Management</h2>
+                    <p>Update fixed coffee prices or size-based Milk Tea and Juice prices.</p>
+                </div>
+                <form id="priceForm" class="management-form stacked-form">
+                    <label>
+                        Select Product
+                        <select id="priceProductSelect"></select>
+                    </label>
+                    <div id="priceFields" class="price-fields"></div>
+                    <button type="submit">Update Price</button>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Admin Module</span>
+                    <h2>Materials Management</h2>
+                    <p>Material stock is now the inventory source for completed transactions.</p>
+                </div>
+                <form id="materialForm" class="management-form stacked-form">
+                    <input type="hidden" id="materialEditId">
+                    <label>
+                        Material Name
+                        <input type="text" id="materialNameInput" placeholder="Example: Creamer">
+                    </label>
+                    <label>
+                        Quantity
+                        <input type="number" id="materialQuantityInput" min="0" step="1" placeholder="100">
+                    </label>
+                    <label>
+                        Unit
+                        <input type="text" id="materialUnitInput" placeholder="servings">
+                    </label>
+                    <label>
+                        Low Stock Threshold
+                        <input type="number" id="materialThresholdInput" min="0" step="1" placeholder="10">
+                    </label>
+                    <button type="submit">Save Material</button>
+                    <button type="button" class="secondary-btn" id="clearMaterialFormBtn">Clear Form</button>
+                </form>
+                <div class="admin-table-wrap" id="materialList"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Admin Module</span>
+                    <h2>Stock Replenishment</h2>
+                    <p>Record replenishments with supplier and storage location references.</p>
+                </div>
+                <form id="replenishmentForm" class="management-form stacked-form">
+                    <label>
+                        Material
+                        <select id="replenishMaterialSelect"></select>
+                    </label>
+                    <label>
+                        Quantity to Add
+                        <input type="number" id="replenishQuantityInput" min="1" step="1" placeholder="10">
+                    </label>
+                    <label>
+                        Supplier
+                        <select id="replenishSupplierSelect"></select>
+                    </label>
+                    <label>
+                        Storage Location
+                        <select id="replenishLocationSelect"></select>
+                    </label>
+                    <button type="submit">Save Replenishment</button>
+                </form>
+                <div class="admin-table-wrap" id="replenishmentList"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Admin Module</span>
+                    <h2>Recipe Mapping</h2>
+                    <p>Set the materials used by each beverage and size.</p>
+                </div>
+                <form id="recipeForm" class="management-form stacked-form">
+                    <label>
+                        Product
+                        <select id="recipeProductSelect"></select>
+                    </label>
+                    <label>
+                        Size
+                        <select id="recipeSizeSelect"></select>
+                    </label>
+                    <div id="recipeMaterialFields" class="recipe-fields"></div>
+                    <button type="submit">Save Recipe</button>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Reference Data</span>
+                    <h2>Supplier Records</h2>
+                    <p>Suppliers are references only and do not have login access.</p>
+                </div>
+                <form id="supplierForm" class="management-form stacked-form">
+                    <input type="hidden" id="supplierEditId">
+                    <label>
+                        Supplier Name
+                        <input type="text" id="supplierNameInput" placeholder="Example: Sweet Supplies Co.">
+                    </label>
+                    <label>
+                        Contact
+                        <input type="text" id="supplierContactInput" placeholder="Phone or email">
+                    </label>
+                    <label>
+                        Notes
+                        <textarea id="supplierNotesInput" rows="3" placeholder="Reference notes"></textarea>
+                    </label>
+                    <button type="submit">Save Supplier</button>
+                    <button type="button" class="secondary-btn" id="clearSupplierFormBtn">Clear Form</button>
+                </form>
+                <div class="admin-table-wrap" id="supplierList"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Reference Data</span>
+                    <h2>Storage Locations</h2>
+                    <p>Track where materials are stored for replenishment records.</p>
+                </div>
+                <form id="locationForm" class="management-form stacked-form">
+                    <input type="hidden" id="locationEditId">
+                    <label>
+                        Location Name
+                        <input type="text" id="locationNameInput" placeholder="Shelf, Stock Room, Refrigerator">
+                    </label>
+                    <label>
+                        Notes
+                        <input type="text" id="locationNotesInput" placeholder="Optional notes">
+                    </label>
+                    <button type="submit">Save Location</button>
+                    <button type="button" class="secondary-btn" id="clearLocationFormBtn">Clear Form</button>
+                </form>
+                <div class="admin-table-wrap" id="locationList"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="section-heading">
+                    <span>Admin Report</span>
+                    <h2>Sales Report</h2>
+                    <p>Summary based on completed transactions stored in this browser.</p>
+                </div>
+                <div class="report-grid">
+                    <div>
+                        <span>Total Sales</span>
+                        <strong id="reportTotalSales">PHP 0.00</strong>
+                    </div>
+                    <div>
+                        <span>Transactions</span>
+                        <strong id="reportTransactionCount">0</strong>
+                    </div>
+                    <div>
+                        <span>Most Sold Beverage</span>
+                        <strong id="reportMostSold">None yet</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card wide-card audit-card">
+                <div class="section-heading">
+                    <span>Admin Records</span>
+                    <h2>Audit Records</h2>
+                    <p>Important system actions are saved in localStorage for frontend demo tracking.</p>
+                </div>
+                <button class="secondary-btn danger-lite" id="clearAuditBtn" type="button">Clear Audit Log</button>
+                <div class="history-list audit-list" id="auditList"></div>
+            </div>
+
+            <div class="admin-card wide-card history-card">
+                <div class="section-heading">
+                    <span>Admin Records</span>
+                    <h2>Transaction History</h2>
+                    <p>Newest completed transactions appear first.</p>
+                </div>
+                <div class="history-list" id="transactionHistoryList"></div>
+            </div>
+        </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+

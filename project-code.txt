@@ -1,0 +1,1493 @@
+
+===== index.html =====
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marchendise Beverages</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section class="login-screen" id="loginScreen">
+    <form class="login-card" id="loginForm">
+      <p class="shop-label">Marchennai Beverage Shop</p>
+      <h1>Marchendise Beverages</h1>
+      <p class="login-note">Demo login only, not secure production authentication. Use admin/admin123 or cashier/cashier123.</p>
+
+      <label for="usernameInput">Username</label>
+      <input type="text" id="usernameInput" autocomplete="username" placeholder="Enter username">
+
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" autocomplete="current-password" placeholder="Enter password">
+
+      <button class="complete-btn" type="submit">Login</button>
+      <p class="message" id="loginMessage"></p>
+    </form>
+  </section>
+
+  <div class="app-shell hidden" id="appShell">
+    <header class="app-header">
+      <div>
+        <p class="shop-label">Marchennai Beverage Shop</p>
+        <h1>Marchendise Beverages</h1>
+      </div>
+      <div class="user-box">
+        <span id="roleDisplay">Role: Guest</span>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <main class="pos-layout">
+      <section class="menu-section">
+        <div class="category-bar" aria-label="Product categories">
+          <button class="category-btn active" data-category="All">All</button>
+          <button class="category-btn" data-category="Coffee">Coffee</button>
+          <button class="category-btn" data-category="Juice">Juice</button>
+          <button class="category-btn" data-category="Milk Tea">Milk Tea</button> 
+        </div>
+
+        <div class="section-heading">
+          <h2>Product Menu</h2>
+          <p>Choose a drink to add it to the order.</p>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+      </section>
+
+      <aside class="cart-panel">
+        <div class="cart-header">
+          <h2>Order Summary</h2>
+          <span id="itemCount">0 items</span>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+          <p class="empty-cart">No drinks added yet.</p>
+        </div>
+
+        <div class="payment-box">
+          <div class="total-row">
+            <span>Total Amount</span>
+            <strong id="totalAmount">PHP 0.00</strong>
+          </div>
+
+          <label for="cashInput">Cash</label>
+          <input type="number" id="cashInput" min="0" step="1" placeholder="Enter cash amount">
+
+          <div class="change-row">
+            <span>Change</span>
+            <strong id="changeAmount">PHP 0.00</strong>
+          </div>
+
+          <p class="message" id="message"></p>
+        </div>
+
+        <div class="action-buttons">
+          <button class="complete-btn" id="completeBtn">Complete Transaction</button>
+          <button class="cancel-btn" id="cancelBtn">Cancel Transaction</button>
+          <button class="reset-btn" id="resetBtn">Reset/New Transaction</button>
+        </div>
+      </aside>
+    </main>
+
+    <section class="admin-panel hidden" id="adminPanel">
+      <div class="admin-card">
+        <h2>Stock Management</h2>
+        <form class="admin-form" id="stockForm">
+          <label for="stockProductSelect">Select Product</label>
+          <select id="stockProductSelect"></select>
+
+          <label for="stockAddInput">Quantity to Add</label>
+          <input type="number" id="stockAddInput" min="1" step="1" placeholder="Enter quantity">
+
+          <button type="submit">Update Stock</button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h2>Price Update</h2>
+        <form class="admin-form" id="priceForm">
+          <label for="priceProductSelect">Select Product</label>
+          <select id="priceProductSelect"></select>
+
+          <label for="newPriceInput">New Price</label>
+          <input type="number" id="newPriceInput" min="1" step="1" placeholder="Enter new price">
+
+          <button type="submit">Update Price</button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h2>Sales Report</h2>
+        <div class="report-grid">
+          <div>
+            <span>Number of Transactions</span>
+            <strong id="reportTransactions">0</strong>
+          </div>
+          <div>
+            <span>Most Sold Beverage</span>
+            <strong id="reportMostSold">None</strong>
+          </div>
+          <div>
+            <span>Total Sales Amount</span>
+            <strong id="reportSales">PHP 0.00</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card history-card">
+        <h2>Transaction History</h2>
+        <div class="transaction-history" id="transactionHistory">
+          <p class="empty-cart">No transactions yet.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+===== style.css =====
+:root {
+  --pink-50: #fff7fb;
+  --pink-100: #ffe6f1;
+  --pink-200: #ffc9df;
+  --pink-300: #f7a8c9;
+  --pink-500: #e9689c;
+  --button-pink: #f7a8d7;
+  --button-purple: #c9b6ff;
+  --button-pink-dark: #ef86c2;
+  --button-purple-dark: #ad94f2;
+  --purple-100: #f0e7ff;
+  --purple-300: #c8a8ff;
+  --purple-500: #9065d8;
+  --rose: #b83f73;
+  --coffee: #8b5e4a;
+  --mint: #68a88a;
+  --text: #45323b;
+  --muted: #8a6f7b;
+  --white: #ffffff;
+  --shadow: 0 18px 45px rgba(144, 101, 216, 0.16);
+  --soft-shadow: 0 10px 24px rgba(184, 63, 115, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 8%, #ffe0ef 0, transparent 30%),
+    radial-gradient(circle at 88% 0%, #eee1ff 0, transparent 28%),
+    linear-gradient(135deg, var(--pink-50), #ffffff 48%, #f8f1ff);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.login-screen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-card {
+  display: grid;
+  gap: 12px;
+  width: min(420px, 100%);
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(144, 101, 216, 0.16);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.login-card h1 {
+  font-size: 28px;
+}
+
+.login-note {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background: linear-gradient(135deg, var(--pink-200), var(--purple-100));
+  border-bottom: 1px solid rgba(184, 63, 115, 0.16);
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+#roleDisplay {
+  padding: 10px 14px;
+  color: var(--purple-500);
+  background: var(--white);
+  border: 1px solid var(--purple-300);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.logout-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--button-pink), var(--button-purple));
+  border-radius: 16px;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(91, 49, 117, 0.25);
+}
+
+.shop-label {
+  margin: 0 0 6px;
+  color: var(--purple-500);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  color: var(--button-pink-dark);
+  font-size: clamp(26px, 4vw, 40px);
+  -webkit-text-stroke: 1px var(--white);
+  text-shadow:
+    1px 1px 0 var(--white),
+    -1px 1px 0 var(--white),
+    1px -1px 0 var(--white),
+    -1px -1px 0 var(--white),
+    0 4px 12px rgba(173, 148, 242, 0.22);
+}
+
+.pos-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  width: min(1180px, calc(100% - 32px));
+  margin: 24px auto;
+  align-items: start;
+}
+
+.menu-section,
+.cart-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(144, 101, 216, 0.14);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+
+.menu-section {
+  padding: 22px;
+}
+
+.category-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.category-btn {
+  min-height: 48px;
+  padding: 0 22px;
+  color: var(--purple-500);
+  background: linear-gradient(135deg, var(--pink-100), var(--purple-100));
+  border: 1px solid rgba(144, 101, 216, 0.18);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.category-btn.active,
+.category-btn:hover {
+  color: var(--white);
+  background: linear-gradient(135deg, var(--button-pink), var(--button-purple));
+  text-shadow: 0 1px 1px rgba(91, 49, 117, 0.25);
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.section-heading h2,
+.cart-header h2 {
+  margin-bottom: 0;
+  font-size: 22px;
+}
+
+.section-heading p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.product-card {
+  display: grid;
+  gap: 14px;
+  min-height: 220px;
+  padding: 20px;
+  background: linear-gradient(180deg, var(--white), var(--pink-50));
+  border: 1px solid rgba(233, 104, 156, 0.16);
+  border-radius: 22px;
+  box-shadow: var(--soft-shadow);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.product-card:hover {
+  border-color: var(--purple-300);
+  box-shadow: 0 16px 30px rgba(144, 101, 216, 0.18);
+  transform: translateY(-2px);
+}
+
+.drink-image,
+.drink-icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  background: linear-gradient(135deg, var(--pink-100), var(--purple-100));
+  border: 1px solid rgba(144, 101, 216, 0.12);
+  border-radius: 50%;
+  box-shadow: inset 0 6px 16px rgba(255, 255, 255, 0.76), 0 8px 18px rgba(144, 101, 216, 0.14);
+  overflow: hidden;
+}
+
+.drink-image img {
+  width: 88%;
+  height: 88%;
+  object-fit: contain;
+}
+
+.drink-image .hidden-image {
+  display: none;
+}
+
+.drink-icon svg {
+  width: 68px;
+  height: 68px;
+  filter: drop-shadow(0 6px 7px rgba(69, 50, 59, 0.18));
+}
+
+.product-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.size-label {
+  margin-bottom: -8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.size-select {
+  min-height: 42px;
+  background: linear-gradient(135deg, var(--white), var(--pink-50));
+}
+
+.stock-badge {
+  width: fit-content;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.stock-badge.available {
+  color: #32745b;
+  background: #dff5eb;
+}
+
+.stock-badge.low-stock {
+  color: #9a6b14;
+  background: #fff0c2;
+}
+
+.stock-badge.out-of-stock {
+  color: #9d3a55;
+  background: #ffe0ea;
+}
+
+.price {
+  color: var(--purple-500);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.add-btn {
+  min-height: 52px;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--button-pink), var(--button-purple));
+  border-radius: 16px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(173, 148, 242, 0.22);
+  text-shadow: 0 1px 1px rgba(91, 49, 117, 0.25);
+}
+
+.add-btn:disabled {
+  cursor: not-allowed;
+  background: #d8c9cf;
+}
+
+.cart-panel {
+  position: sticky;
+  top: 16px;
+  padding: 22px;
+}
+
+.cart-header,
+.total-row,
+.change-row,
+.cart-line,
+.cart-line-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cart-header {
+  padding-bottom: 16px;
+  border-bottom: 2px dashed var(--pink-200);
+}
+
+#itemCount {
+  color: var(--purple-500);
+  font-weight: 700;
+}
+
+.cart-items {
+  display: grid;
+  gap: 12px;
+  min-height: 140px;
+  max-height: 310px;
+  overflow-y: auto;
+  padding: 16px 0;
+}
+
+.empty-cart {
+  margin: auto;
+  color: var(--muted);
+  text-align: center;
+}
+
+.cart-line {
+  padding: 14px;
+  background: linear-gradient(135deg, var(--pink-50), var(--purple-100));
+  border: 1px solid rgba(144, 101, 216, 0.12);
+  border-radius: 18px;
+}
+
+.cart-line h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.cart-line p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  color: var(--purple-500);
+  background: var(--white);
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.payment-box {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 2px dashed var(--pink-200);
+  border-bottom: 2px dashed var(--pink-200);
+}
+
+.total-row strong,
+.change-row strong {
+  color: var(--purple-500);
+  font-size: 24px;
+}
+
+label {
+  font-weight: 700;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid rgba(144, 101, 216, 0.22);
+  border-radius: 14px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--pink-500);
+  box-shadow: 0 0 0 3px rgba(233, 104, 156, 0.16);
+}
+
+.message {
+  min-height: 22px;
+  padding: 8px 10px;
+  margin-bottom: 0;
+  color: #8c3d63;
+  background: #fff0f7;
+  border: 1px solid #ffd2e5;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.message:empty {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.action-buttons {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+}
+
+.action-buttons button {
+  min-height: 52px;
+  border-radius: 16px;
+  font-weight: 800;
+}
+
+.complete-btn {
+  color: var(--white);
+  background: linear-gradient(135deg, #f7a8d7, #b9e6da);
+  text-shadow: 0 1px 1px rgba(77, 89, 102, 0.25);
+}
+
+.cancel-btn {
+  color: var(--white);
+  background: linear-gradient(135deg, #e9b2ca, #c9b6ff);
+  text-shadow: 0 1px 1px rgba(91, 49, 117, 0.25);
+}
+
+.reset-btn {
+  color: var(--purple-500);
+  background: linear-gradient(135deg, var(--pink-100), var(--purple-100));
+  border: 1px solid rgba(144, 101, 216, 0.18);
+}
+
+.admin-panel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 24px;
+}
+
+.admin-card {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(144, 101, 216, 0.14);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+
+.admin-card h2 {
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-form button {
+  min-height: 50px;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--button-pink), var(--button-purple));
+  border-radius: 16px;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(91, 49, 117, 0.25);
+}
+
+.report-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.report-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--pink-50), var(--purple-100));
+  border: 1px solid rgba(144, 101, 216, 0.12);
+  border-radius: 18px;
+}
+
+.report-grid span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.report-grid strong {
+  color: var(--purple-500);
+  font-size: 22px;
+}
+
+.history-card {
+  grid-column: 1 / -1;
+}
+
+.transaction-history {
+  display: grid;
+  gap: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.transaction-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--pink-50), var(--white));
+  border: 1px solid rgba(144, 101, 216, 0.12);
+  border-radius: 18px;
+}
+
+.transaction-top,
+.transaction-money {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.transaction-top strong,
+.transaction-money strong {
+  color: var(--purple-500);
+}
+
+.transaction-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.transaction-card li {
+  margin-bottom: 4px;
+}
+
+@media (max-width: 900px) {
+  .pos-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-panel {
+    position: static;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    display: grid;
+    padding: 20px 16px;
+  }
+
+  .user-box {
+    justify-content: flex-start;
+  }
+
+  .pos-layout {
+    width: calc(100% - 20px);
+    margin: 10px auto 20px;
+    gap: 14px;
+  }
+
+  .menu-section,
+  .cart-panel {
+    padding: 14px;
+  }
+
+  .section-heading {
+    display: block;
+  }
+
+  .section-heading p {
+    margin-top: 6px;
+  }
+
+  .category-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .category-btn {
+    width: 100%;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-panel {
+    width: calc(100% - 20px);
+  }
+
+}
+
+
+
+===== script.js =====
+const storageKey = "beveragePosProductStockV2";
+const priceStorageKey = "beveragePosProductPricesV2";
+const transactionStorageKey = "beveragePosTransactionHistory";
+
+const defaultProducts = [
+  { id: 1, name: "Americano", category: "Coffee", price: 80, stock: 20, imagePath: "images/coffee/americano.png" },
+  { id: 2, name: "Latte", category: "Coffee", price: 95, stock: 20, imagePath: "images/coffee/latte.png" },
+  { id: 3, name: "Cappuccino", category: "Coffee", price: 95, stock: 20, imagePath: "images/coffee/cappuccino.png" },
+  { id: 4, name: "Mocha", category: "Coffee", price: 100, stock: 20, imagePath: "images/coffee/mocha.png" },
+  { id: 5, name: "Caramel Macchiato", category: "Coffee", price: 110, stock: 20, imagePath: "images/coffee/caramel-macchiato.png" },
+  { id: 6, name: "Spanish Latte", category: "Coffee", price: 110, stock: 20, imagePath: "images/coffee/spanish-latte.png" },
+  { id: 7, name: "Biscoff Latte", category: "Coffee", price: 120, stock: 20, imagePath: "images/coffee/biscoff-latte.png" },
+  { id: 8, name: "Hazelnut Latte", category: "Coffee", price: 110, stock: 20, imagePath: "images/coffee/hazelnut-latte.png" },
+  { id: 9, name: "Vanilla Latte", category: "Coffee", price: 110, stock: 20, imagePath: "images/coffee/vanilla-latte.png" },
+  { id: 10, name: "Lychee", category: "Juice", sizes: { Small: 19, Medium: 29, Large: 39, XL: 49 }, stock: 20, imagePath: "images/juice/lychee.png" },
+  { id: 11, name: "Blue Lemonade", category: "Juice", sizes: { Small: 19, Medium: 29, Large: 39, XL: 49 }, stock: 20, imagePath: "images/juice/blue-lemonade.png" },
+  { id: 12, name: "Green Apple", category: "Juice", sizes: { Small: 19, Medium: 29, Large: 39, XL: 49 }, stock: 20, imagePath: "images/juice/green-apple.png" },
+  { id: 13, name: "Blueberry", category: "Juice", sizes: { Small: 19, Medium: 29, Large: 39, XL: 49 }, stock: 20, imagePath: "images/juice/blueberry.png" },
+  { id: 14, name: "Strawberry", category: "Juice", sizes: { Small: 19, Medium: 29, Large: 39, XL: 49 }, stock: 20, imagePath: "images/juice/strawberry.png" },
+  { id: 15, name: "Brown Sugar", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/brown-sugar.png" },
+  { id: 16, name: "Matcha", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/matcha.png" },
+  { id: 17, name: "Okinawa", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/okinawa.png" },
+  { id: 18, name: "Taro", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/taro.png" },
+  { id: 19, name: "Wintermelon", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/wintermelon.png" },
+  { id: 20, name: "Tiramisu", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/tiramisu.png" },
+  { id: 21, name: "Hokkaido", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/hokkaido.png" },
+  { id: 22, name: "Salted Caramel", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/salted-caramel.png" },
+  { id: 23, name: "Dark Belgian Choco", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/dark-belgian-choco.png" },
+  { id: 24, name: "Oreo Cheesecake", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/oreo-cheesecake.png" },
+  { id: 25, name: "Blueberry Cheesecake", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/blueberry-cheesecake.png" },
+  { id: 26, name: "Strawberry Cheesecake", category: "Milk Tea", sizes: { Medium: 80, Large: 90 }, stock: 25, imagePath: "images/milktea/strawberry-cheesecake.png" }
+];
+
+let products = loadProducts();
+let selectedCategory = "All";
+let cart = [];
+let transactionHistory = loadTransactionHistory();
+let currentUser = null;
+
+const loginScreen = document.getElementById("loginScreen");
+const loginForm = document.getElementById("loginForm");
+const usernameInput = document.getElementById("usernameInput");
+const passwordInput = document.getElementById("passwordInput");
+const loginMessage = document.getElementById("loginMessage");
+const appShell = document.getElementById("appShell");
+const roleDisplay = document.getElementById("roleDisplay");
+const logoutBtn = document.getElementById("logoutBtn");
+const productGrid = document.getElementById("productGrid");
+const cartItems = document.getElementById("cartItems");
+const itemCount = document.getElementById("itemCount");
+const totalAmount = document.getElementById("totalAmount");
+const cashInput = document.getElementById("cashInput");
+const changeAmount = document.getElementById("changeAmount");
+const message = document.getElementById("message");
+const completeBtn = document.getElementById("completeBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const resetBtn = document.getElementById("resetBtn");
+const categoryButtons = document.querySelectorAll(".category-btn");
+const adminPanel = document.getElementById("adminPanel");
+const stockForm = document.getElementById("stockForm");
+const stockProductSelect = document.getElementById("stockProductSelect");
+const stockAddInput = document.getElementById("stockAddInput");
+const priceForm = document.getElementById("priceForm");
+const priceProductSelect = document.getElementById("priceProductSelect");
+const newPriceInput = document.getElementById("newPriceInput");
+const reportTransactions = document.getElementById("reportTransactions");
+const reportMostSold = document.getElementById("reportMostSold");
+const reportSales = document.getElementById("reportSales");
+const transactionHistoryBox = document.getElementById("transactionHistory");
+
+const demoAccounts = [
+  { username: "admin", password: "admin123", role: "Admin" },
+  { username: "cashier", password: "cashier123", role: "Cashier" }
+];
+
+function formatMoney(amount) {
+  return "PHP " + amount.toFixed(2);
+}
+
+function getProductPrice(product) {
+  if (product.price !== undefined) {
+    return product.price;
+  }
+
+  return Object.values(product.sizes)[0];
+}
+
+function getPriceText(product) {
+  if (product.price !== undefined) {
+    return formatMoney(product.price);
+  }
+
+  return Object.keys(product.sizes).map((size) => {
+    return size + " " + formatMoney(product.sizes[size]);
+  }).join(" / ");
+}
+
+function getSizeOptions(product) {
+  if (!product.sizes) {
+    return "";
+  }
+
+  const options = Object.keys(product.sizes).map((size) => {
+    return `<option value="${size}">${size} - ${formatMoney(product.sizes[size])}</option>`;
+  }).join("");
+
+  return `
+    <label class="size-label" for="size-${product.id}">Size</label>
+    <select class="size-select" id="size-${product.id}" data-id="${product.id}">
+      ${options}
+    </select>
+  `;
+}
+
+function loadProducts() {
+  const savedStock = JSON.parse(localStorage.getItem(storageKey));
+  const savedPrices = JSON.parse(localStorage.getItem(priceStorageKey));
+
+  return defaultProducts.map((product) => ({
+    ...product,
+    price: product.price !== undefined && savedPrices && savedPrices[product.id] !== undefined ? savedPrices[product.id] : product.price,
+    sizes: product.sizes && savedPrices && savedPrices[product.id] !== undefined ? savedPrices[product.id] : product.sizes,
+    stock: savedStock && savedStock[product.id] !== undefined ? savedStock[product.id] : product.stock
+  }));
+}
+
+function saveProducts() {
+  const stockData = {};
+
+  products.forEach((product) => {
+    stockData[product.id] = product.stock;
+  });
+
+  localStorage.setItem(storageKey, JSON.stringify(stockData));
+}
+
+function savePrices() {
+  const priceData = {};
+
+  products.forEach((product) => {
+    if (product.price !== undefined) {
+      priceData[product.id] = product.price;
+    } else {
+      priceData[product.id] = product.sizes;
+    }
+  });
+
+  localStorage.setItem(priceStorageKey, JSON.stringify(priceData));
+}
+
+function loadTransactionHistory() {
+  const savedHistory = JSON.parse(localStorage.getItem(transactionStorageKey));
+
+  if (!savedHistory) {
+    return [];
+  }
+
+  return savedHistory;
+}
+
+function saveTransactionHistory() {
+  localStorage.setItem(transactionStorageKey, JSON.stringify(transactionHistory));
+}
+
+function getStockStatus(stock) {
+  if (stock === 0) {
+    return "Out of Stock";
+  }
+
+  if (stock <= 5) {
+    return "Low Stock";
+  }
+
+  return "Available";
+}
+
+function getStatusClass(status) {
+  return status.toLowerCase().replaceAll(" ", "-");
+}
+
+function getCartQuantity(productId) {
+  return cart
+    .filter((item) => item.id === productId)
+    .reduce((sum, item) => sum + item.quantity, 0);
+}
+
+function getTotal() {
+  return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+}
+
+function getDrinkSticker(category) {
+  if (category === "Milk Tea") {
+    return `
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <defs>
+          <linearGradient id="milkTeaGradient" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#f8d2ac" />
+            <stop offset="55%" stop-color="#c89062" />
+            <stop offset="100%" stop-color="#8f5a3d" />
+          </linearGradient>
+          <linearGradient id="cupShine" x1="0" x2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.78" />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08" />
+          </linearGradient>
+        </defs>
+        <path d="M26 21h28l-4 43H30L26 21Z" fill="url(#milkTeaGradient)" />
+        <path d="M30 25h7l-2 35h-4l-2-31c0-2 0-3 1-4Z" fill="url(#cupShine)" />
+        <path d="M24 17h32v7H24v-7Z" fill="#fff4fb" />
+        <path d="M48 8h6L37 45h-6L48 8Z" fill="#8d64c8" />
+        <circle cx="34" cy="57" r="3" fill="#4a3027" />
+        <circle cx="42" cy="59" r="3" fill="#4a3027" />
+        <circle cx="47" cy="53" r="3" fill="#4a3027" />
+      </svg>
+    `;
+  }
+
+  if (category === "Coffee") {
+    return `
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <defs>
+          <linearGradient id="coffeeCupGradient" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#fff8fb" />
+            <stop offset="58%" stop-color="#d9c6ff" />
+            <stop offset="100%" stop-color="#b58bea" />
+          </linearGradient>
+          <linearGradient id="coffeeGradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#8a5639" />
+            <stop offset="100%" stop-color="#4d2d20" />
+          </linearGradient>
+        </defs>
+        <path d="M22 29h33v22c0 8-6 14-14 14h-5c-8 0-14-6-14-14V29Z" fill="url(#coffeeCupGradient)" />
+        <path d="M55 35h4c6 0 10 4 10 9s-4 9-10 9h-4v-6h4c2 0 4-1 4-3s-2-3-4-3h-4v-6Z" fill="#ccb3ff" />
+        <ellipse cx="38.5" cy="30" rx="16.5" ry="5.5" fill="url(#coffeeGradient)" />
+        <path d="M30 21c-3-4 3-6 0-10M40 21c-3-4 3-6 0-10M50 21c-3-4 3-6 0-10" stroke="#9b78d4" stroke-width="3" stroke-linecap="round" fill="none" />
+        <path d="M28 36c4 5 14 6 22 1" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+      </svg>
+    `;
+  }
+
+  return `
+    <svg viewBox="0 0 80 80" aria-hidden="true">
+      <defs>
+        <linearGradient id="juiceGradient" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#ffe08a" />
+          <stop offset="52%" stop-color="#ff91bd" />
+          <stop offset="100%" stop-color="#bd8cff" />
+        </linearGradient>
+        <linearGradient id="glassShine" x1="0" x2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.1" />
+        </linearGradient>
+      </defs>
+      <path d="M25 20h30l-5 45H30L25 20Z" fill="url(#juiceGradient)" />
+      <path d="M30 25h8l-3 35h-4l-2-30c0-2 0-4 1-5Z" fill="url(#glassShine)" />
+      <path d="M23 18h34" stroke="#fff8fb" stroke-width="6" stroke-linecap="round" />
+      <path d="M49 9h6L38 43h-6L49 9Z" fill="#8d64c8" />
+      <circle cx="53" cy="22" r="8" fill="#ffcf63" />
+      <path d="M53 14v16M45 22h16" stroke="#fff8c8" stroke-width="2" />
+    </svg>
+  `;
+}
+
+function login(username, password) {
+  const account = demoAccounts.find((user) => {
+    return user.username === username && user.password === password;
+  });
+
+  if (!account) {
+    loginMessage.textContent = "Invalid demo username or password.";
+    return;
+  }
+
+  currentUser = account;
+  loginMessage.textContent = "";
+  usernameInput.value = "";
+  passwordInput.value = "";
+  loginScreen.classList.add("hidden");
+  appShell.classList.remove("hidden");
+  roleDisplay.textContent = "Role: " + currentUser.role;
+  adminPanel.classList.toggle("hidden", currentUser.role !== "Admin");
+  renderProducts();
+  renderCart();
+  renderAdminSections();
+}
+
+function logout() {
+  currentUser = null;
+  clearTransaction("");
+  appShell.classList.add("hidden");
+  adminPanel.classList.add("hidden");
+  loginScreen.classList.remove("hidden");
+}
+
+function renderProducts() {
+  const filteredProducts = selectedCategory === "All"
+    ? products
+    : products.filter((product) => product.category === selectedCategory);
+
+  productGrid.innerHTML = "";
+
+  filteredProducts.forEach((product) => {
+    const quantityInCart = getCartQuantity(product.id);
+    const availableStock = product.stock - quantityInCart;
+    const stockStatus = getStockStatus(product.stock);
+    const card = document.createElement("article");
+    const firstPrice = getProductPrice(product);
+
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="drink-image">
+        <img src="${product.imagePath}" alt="${product.name}" onerror="this.classList.add('hidden-image'); this.nextElementSibling.classList.remove('hidden');">
+        <div class="drink-icon hidden">${getDrinkSticker(product.category)}</div>
+      </div>
+      <div>
+        <h3>${product.name}</h3>
+        <div class="product-meta">
+          <span>${product.category}</span>
+          <span>Stock: ${product.stock}</span>
+        </div>
+      </div>
+      <span class="stock-badge ${getStatusClass(stockStatus)}">${stockStatus}</span>
+      ${getSizeOptions(product)}
+      <div class="price" id="price-${product.id}">${product.sizes ? formatMoney(firstPrice) : getPriceText(product)}</div>
+      <button class="add-btn" data-id="${product.id}" ${availableStock === 0 ? "disabled" : ""}>
+        ${availableStock === 0 ? "Out of Stock" : "Add to Cart"}
+      </button>
+    `;
+
+    productGrid.appendChild(card);
+  });
+
+  document.querySelectorAll(".add-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.id);
+      const sizeSelect = document.getElementById("size-" + productId);
+      const selectedSize = sizeSelect ? sizeSelect.value : "Regular";
+
+      addToCart(productId, selectedSize);
+    });
+  });
+
+  document.querySelectorAll(".size-select").forEach((select) => {
+    select.addEventListener("change", () => {
+      const product = products.find((item) => item.id === Number(select.dataset.id));
+      const priceBox = document.getElementById("price-" + product.id);
+
+      priceBox.textContent = formatMoney(product.sizes[select.value]);
+    });
+  });
+}
+
+function renderAdminSections() {
+  if (!currentUser || currentUser.role !== "Admin") {
+    return;
+  }
+
+  const currentStockProduct = stockProductSelect.value;
+  const currentPriceProduct = priceProductSelect.value;
+
+  stockProductSelect.innerHTML = "";
+  priceProductSelect.innerHTML = "";
+  products.forEach((product) => {
+    const stockOption = document.createElement("option");
+    const priceOption = document.createElement("option");
+
+    stockOption.value = product.id;
+    stockOption.textContent = product.name + " - Current stock: " + product.stock;
+    priceOption.value = product.id;
+    priceOption.textContent = product.name + " - Current price: " + getPriceText(product);
+
+    stockProductSelect.appendChild(stockOption);
+    priceProductSelect.appendChild(priceOption);
+  });
+
+  stockProductSelect.value = currentStockProduct || products[0].id;
+  priceProductSelect.value = currentPriceProduct || products[0].id;
+
+  renderSalesReport();
+}
+
+function updateProductStock(productId, quantityToAdd) {
+  const product = products.find((item) => item.id === productId);
+
+  if (!quantityToAdd || quantityToAdd <= 0) {
+    message.textContent = "Enter a quantity greater than zero.";
+    return;
+  }
+
+  product.stock += quantityToAdd;
+  saveProducts();
+  message.textContent = "Stock updated.";
+  stockAddInput.value = "";
+  renderCart();
+  renderAdminSections();
+}
+
+function updateProductPrice(productId, newPrice) {
+  const product = products.find((item) => item.id === productId);
+
+  if (!newPrice || newPrice <= 0) {
+    message.textContent = "Price must be greater than zero.";
+    return;
+  }
+
+  if (product.sizes) {
+    Object.keys(product.sizes).forEach((size) => {
+      product.sizes[size] = newPrice;
+    });
+  } else {
+    product.price = newPrice;
+  }
+
+  savePrices();
+  cart.forEach((item) => {
+    if (item.id === productId) {
+      item.price = newPrice;
+    }
+  });
+  message.textContent = "Price updated.";
+  newPriceInput.value = "";
+  renderCart();
+  renderAdminSections();
+}
+
+function renderSalesReport() {
+  const totalSales = transactionHistory.reduce((sum, transaction) => {
+    return sum + transaction.totalAmount;
+  }, 0);
+  const soldCounts = {};
+
+  transactionHistory.forEach((transaction) => {
+    transaction.items.forEach((item) => {
+      soldCounts[item.name] = (soldCounts[item.name] || 0) + item.quantity;
+    });
+  });
+
+  let mostSoldName = "None";
+  let mostSoldQuantity = 0;
+
+  Object.keys(soldCounts).forEach((name) => {
+    if (soldCounts[name] > mostSoldQuantity) {
+      mostSoldName = name;
+      mostSoldQuantity = soldCounts[name];
+    }
+  });
+
+  reportTransactions.textContent = transactionHistory.length;
+  reportMostSold.textContent = mostSoldQuantity > 0
+    ? mostSoldName + " (" + mostSoldQuantity + ")"
+    : "None";
+  reportSales.textContent = formatMoney(totalSales);
+  renderTransactionHistory();
+}
+
+function renderTransactionHistory() {
+  if (!transactionHistory.length) {
+    transactionHistoryBox.innerHTML = '<p class="empty-cart">No transactions yet.</p>';
+    return;
+  }
+
+  transactionHistoryBox.innerHTML = "";
+
+  transactionHistory.slice().reverse().forEach((transaction) => {
+    const card = document.createElement("div");
+    const itemList = transaction.items.map((item) => {
+      return `<li>${item.name} - Qty: ${item.quantity} - ${formatMoney(item.subtotal)}</li>`;
+    }).join("");
+
+    card.className = "transaction-card";
+    card.innerHTML = `
+      <div class="transaction-top">
+        <strong>${transaction.id}</strong>
+        <span>${transaction.dateTime}</span>
+      </div>
+      <ul>${itemList}</ul>
+      <div class="transaction-money">
+        <span>Total: <strong>${formatMoney(transaction.totalAmount)}</strong></span>
+        <span>Cash: <strong>${formatMoney(transaction.cashPaid)}</strong></span>
+        <span>Change: <strong>${formatMoney(transaction.change)}</strong></span>
+      </div>
+    `;
+
+    transactionHistoryBox.appendChild(card);
+  });
+}
+
+function renderCart() {
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const total = getTotal();
+
+  itemCount.textContent = totalItems === 1 ? "1 item" : totalItems + " items";
+  totalAmount.textContent = formatMoney(total);
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p class="empty-cart">No drinks added yet.</p>';
+  } else {
+    cartItems.innerHTML = "";
+
+    cart.forEach((item) => {
+      const line = document.createElement("div");
+
+      line.className = "cart-line";
+      line.innerHTML = `
+        <div>
+          <h3>${item.name}</h3>
+          <p>${item.size} - ${formatMoney(item.price)} x ${item.quantity}</p>
+        </div>
+        <div class="cart-line-actions">
+          <button class="qty-btn" data-action="decrease" data-key="${item.cartKey}">-</button>
+          <strong>${item.quantity}</strong>
+          <button class="qty-btn" data-action="increase" data-key="${item.cartKey}">+</button>
+        </div>
+      `;
+
+      cartItems.appendChild(line);
+    });
+  }
+
+  document.querySelectorAll(".qty-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      updateQuantity(button.dataset.key, button.dataset.action);
+    });
+  });
+
+  updateChange();
+  renderProducts();
+}
+
+function addToCart(productId, selectedSize) {
+  const product = products.find((item) => item.id === productId);
+  const cartKey = productId + "-" + selectedSize;
+  const cartItem = cart.find((item) => item.cartKey === cartKey);
+  const quantityInCart = getCartQuantity(productId);
+  const price = product.sizes ? product.sizes[selectedSize] : product.price;
+
+  if (quantityInCart >= product.stock) {
+    message.textContent = "Cannot add more than the available stock.";
+    return;
+  }
+
+  if (cartItem) {
+    cartItem.quantity += 1;
+  } else {
+    cart.push({
+      cartKey: cartKey,
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      size: selectedSize,
+      price: price,
+      quantity: 1
+    });
+  }
+
+  message.textContent = "";
+  renderCart();
+}
+
+function updateQuantity(cartKey, action) {
+  const cartItem = cart.find((item) => item.cartKey === cartKey);
+
+  if (!cartItem) {
+    return;
+  }
+
+  const product = products.find((item) => item.id === cartItem.id);
+  const quantityInCart = getCartQuantity(product.id);
+
+  if (action === "increase") {
+    if (quantityInCart < product.stock) {
+      cartItem.quantity += 1;
+      message.textContent = "";
+    } else {
+      message.textContent = "No more stock available for this drink.";
+    }
+  }
+
+  if (action === "decrease") {
+    cartItem.quantity -= 1;
+
+    if (cartItem.quantity === 0) {
+      cart = cart.filter((item) => item.cartKey !== cartKey);
+    }
+
+    message.textContent = "";
+  }
+
+  renderCart();
+}
+
+function updateChange() {
+  const cash = Number(cashInput.value);
+  const total = getTotal();
+  const change = cash - total;
+
+  changeAmount.textContent = change > 0 ? formatMoney(change) : formatMoney(0);
+}
+
+function completeTransaction() {
+  const total = getTotal();
+  const cash = Number(cashInput.value);
+  const change = cash - total;
+
+  if (cart.length === 0) {
+    message.textContent = "Please add at least one drink.";
+    return;
+  }
+
+  if (!cashInput.value || cash < total) {
+    message.textContent = "Cash is not enough to complete this transaction.";
+    return;
+  }
+
+  cart.forEach((cartItem) => {
+    const product = products.find((item) => item.id === cartItem.id);
+    product.stock -= cartItem.quantity;
+  });
+
+  const transaction = {
+    id: "TXN-" + Date.now(),
+    dateTime: new Date().toLocaleString(),
+    items: cart.map((item) => ({
+      name: item.size === "Regular" ? item.name : item.name + " (" + item.size + ")",
+      quantity: item.quantity,
+      price: item.price,
+      subtotal: item.price * item.quantity
+    })),
+    totalAmount: total,
+    cashPaid: cash,
+    change: change
+  };
+
+  transactionHistory.push(transaction);
+
+  saveProducts();
+  saveTransactionHistory();
+  cart = [];
+  cashInput.value = "";
+  message.textContent = "Transaction completed. Thank you!";
+  renderCart();
+  renderAdminSections();
+}
+
+function clearTransaction(note) {
+  cart = [];
+  cashInput.value = "";
+  message.textContent = note;
+  renderCart();
+}
+
+categoryButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    categoryButtons.forEach((categoryButton) => categoryButton.classList.remove("active"));
+    button.classList.add("active");
+    selectedCategory = button.dataset.category;
+    renderProducts();
+  });
+});
+
+loginForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  login(usernameInput.value, passwordInput.value);
+});
+
+logoutBtn.addEventListener("click", logout);
+stockForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  updateProductStock(Number(stockProductSelect.value), Number(stockAddInput.value));
+});
+
+priceForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  updateProductPrice(Number(priceProductSelect.value), Number(newPriceInput.value));
+});
+
+cashInput.addEventListener("input", updateChange);
+completeBtn.addEventListener("click", completeTransaction);
+cancelBtn.addEventListener("click", () => clearTransaction("Transaction cancelled."));
+resetBtn.addEventListener("click", () => clearTransaction("Ready for a new transaction."));
+
+loginScreen.classList.remove("hidden");
+appShell.classList.add("hidden");
+
+
+

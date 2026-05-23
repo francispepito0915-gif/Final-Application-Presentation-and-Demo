@@ -1,0 +1,13 @@
+{
+  "name": "marchendise-pos",
+  "version": "1.0.0",
+  "description": "Local POS with account signup and login",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.4",
+    "sqlite3": "^5.1.6"
+  }
+}
